@@ -1,0 +1,223 @@
+<!-- bootstrap css cdn -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<!-- bootstrap js cdn -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+<!-- fontawesome cdn -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<%- include('../partials/navbar'); %>
+
+
+    <div class="container my-5">
+        <form>
+
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label for="">Supplier</label>
+                        <select class="form-control" name="Supplier" id="Supplier">
+                            <option value=""></option>
+
+                            <% d1.forEach(function(blogpost) { %>
+                                <option value="<%= blogpost.objectId %>">
+                                    <%= blogpost.name %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label for="">Product</label>
+                        <select class="form-control" name="product" id="product">
+                            <option value=""></option>
+
+                            <% d.forEach(function(blogpost) { %>
+                                <option value="<%= blogpost.objectId %>|<%= blogpost.name%>">
+                                    <%= blogpost.name %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label for="">Rate</label>
+                        <input type="text" class="form-control" name="rate" id="rate" aria-describedby="helpId"
+                            placeholder="">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label for="">Quantity</label>
+                        <input type="text" class="form-control" name="qty" id="qty" aria-describedby="helpId"
+                            placeholder="">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <button type="button" name="" id="" onclick="add()"
+                        class="mt-4 btn btn-primary btn-lg btn-block font-weight-bold">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container my-5">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Rate</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col">
+
+                <button type="button" onclick="save()" style="display: none;" name="save" id="save"
+                    class="btn btn-primary btn-lg btn-block font-weight-bold">Save</button>
+            </div>
+        </div>
+    </div>
+
+
+    <style>
+        
+        .form-control:focus {
+            color: #495057;
+            background-color: #fff;
+            border-color: #111920;
+            outline: 0;
+            box-shadow: 0 0 0 .2rem rgba(24, 29, 34, 0.25)
+        }
+
+        label {
+            font-size: 20px;
+            color: rgb(53, 56, 58);
+            font-weight: bold;
+        }
+    </style>
+
+    <!-- jquery cdn -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+        var newArray = [];
+        var showArray = [];
+        
+
+        function add() {
+            var f = $('form').serializeArray()
+            console.log(f)
+            var objF = {}
+            var objS = {}
+            var count=0
+            f.forEach(element => {
+              
+                if (element.value == '') {
+                        // alert('please fill ' + element.name)
+                        count++;
+                        // return false;
+                    }
+                objF[element.name] = element.value?.split('|')[0]
+                objS[element.name] = element.value
+
+            });
+            if(count>0)
+            {
+                alert('please fill all fied')
+                return false
+            }
+            newArray.push(objF)
+            showArray.push(objS)
+            console.log(newArray)
+            $('form').trigger("reset");
+            createTable()
+        }
+        var total = 0;
+        createTable()
+        function createTable() {
+            var str = '';
+            total = 0;
+            newArray.forEach(element => {
+                str += ` <tr>
+                    <td>${showValue(element.product)}</td>
+                    <td>${element.rate}</td>
+                    <td>${element.qty}</td>
+                    <td>${parseInt(element.rate) * parseInt(element.qty)}</td>
+                    <td style="color:red">    <i class="fa fa-trash-o " onclick="del('${element.product}')" aria-hidden="true"></i></td>
+                </tr>`
+                total += parseInt(element.rate) * parseInt(element.qty)
+            });
+            str += ` <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>Total : <b>${total}</b></td>
+                    <td > </td>
+                </tr>`
+            $('table tbody').empty().append(str);
+            saveshow()
+        }
+        function del(i) {
+            newArray = newArray.filter((a) => {
+                return a.product != i
+            })
+            total = 0
+            newArray.forEach(element => {
+                total += parseInt(element.rate) * parseInt(element.qty)
+            });
+            createTable()
+        }
+        function saveshow() {
+
+            if (total > 0) {
+                $('#save').show();
+            } else {
+                $('#save').hide();
+            }
+        }
+        var url = 'http://localhost:8080/api/purchase'
+
+        function save() {
+
+            axios.post(url, newArray)
+                .then((response) => {
+                    console.log('response', response);
+                }, (error) => {
+                    console.log(error);
+                });
+        }
+
+        function showValue(e){
+            var s = showArray.filter((o)=>{
+                console.log(o)
+                return o.product?.split('|')[0] == e
+            })
+            console.log(s)
+            return s[0].product?.split('|')[1]
+        }
+
+    </script>
